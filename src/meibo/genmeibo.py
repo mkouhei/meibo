@@ -17,15 +17,28 @@
 """
 import subprocess
 import json
+import os.path
 
 DOMAIN = 'example.org'
+LIST_JSON_PATH = '/tmp/list.json'
+
 
 def generate_meibo_json():
     ml_lists = subprocess.check_output(['list_lists', '-b']).split()
     meibo_l = [{list_name: list_name + '@' + DOMAIN,
                 'members': subprocess.check_output(['list_members',
-                                                    ml_list]).split()}
+                                                    list_name]).split()}
                for list_name in ml_lists]
 
     meibo_j = json.JSONEncoder().encode(meibo_l)
     return meibo_j
+
+
+def main():
+    meibo = generate_meibo_json()
+    with open(os.path.abspath(LIST_JSON_PATH), 'w') as f:
+        f.write(meibo)
+
+
+if __name__ == '__main__':
+    main()
